@@ -32,7 +32,7 @@ public class Bobo{
 		for(;;){
 			System.out.print("=> ");
 			String line=br.readLine();
-			if(line==null) break;
+			if(line==null) break; //ctrl+D in wsl, maybe add some command for exit later?
 			run(line);
 			hadError=false; //reset error flag for next line
 		}
