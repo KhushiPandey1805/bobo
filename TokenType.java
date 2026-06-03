@@ -3,7 +3,7 @@ package com.github.khushipandey1805.bobo;
 enum TokenType{
     //single character tokens
     LEFT_PAREN, RIGHT_PAREN, 
-    LEFT_BRACE, RIGHT_BRACE, 
+    LEFT_BRACE, RIGHT_BRACE, //no square braces currently :(
     COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR, HASH,
 
     //one or two character tokens
