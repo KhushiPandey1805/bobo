@@ -68,7 +68,7 @@ class Scanner{
             case '=': addToken(match('=')? EQUAL_EQUAL: EQUAL); break;
             case '<': addToken(match('=')? LESS_EQUAL: LESS); break;
             case '>': addToken(match('=')? GREATER_EQUAL: GREATER); break;
-            case '#': while(peek()!='\n' && !isAtEnd()) advance(); break; //comment till end of line
+            case '#': while(peek()!='\n' && !isAtEnd()) advance(); break; //comment till end of line, add multiline comments some day
             case ' ': //ignore whitespace
             case '\r': //ignore carriage return
             case '\t': break; //ignore tab
