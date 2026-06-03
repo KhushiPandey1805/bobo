@@ -112,7 +112,7 @@ class Scanner{
                 line++;
             advance();
         }
-        if(!isAtEnd()){
+        if(isAtEnd()){
             Bobo.error(line, "Unterminated string");
             return;
         }
