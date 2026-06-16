@@ -40,12 +40,12 @@ public class Bobo{
 	private static void run(String source){
 		Scanner sc=new Scanner(source);
 		List<Token> tokens=sc.scanTokens();
-
-		//print tokens only for now
-		for(Token tk: tokens){
-			System.out.println(tk);
-		}
-		//TODO: create parser, resolver, interpreter
+		Parser parser=new Parser(tokens);
+		Expr expression=parser.parse();
+		if(hadError)
+			return;
+		System.out.println(new AstPrinter().print(expression));
+		//TODO: create resolver, interpreter
 	}
 	static void error(int line, String message){
 		report(line, "", message);
@@ -53,5 +53,13 @@ public class Bobo{
 	private static void report(int line, String where, String message){
 		System.err.println("[line "+line+"] Oopsies"+where+": "+message); //[line 3] Oopsies: unexpected character
 		hadError=true;
+	}
+	static void error(Token token, String message){
+		if(token.type==TokenType.EOF){
+			report(token.line, " at end", message);
+		}
+		else{
+			report(token.line, " at '"+token.lexeme+"'",message);
+		}
 	}
 }
