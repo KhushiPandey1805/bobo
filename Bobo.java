@@ -9,7 +9,9 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Bobo{
+	private static final Interpreter interpreter=new Interpreter();
 	static boolean hadError=false;
+	static boolean hadRuntimeError=false;
 	public static void main(String args[]) throws IOException{
 		if(args.length>1){
 			System.out.println("Usage: bobo [script]"); //bobo stuff.bobo
@@ -25,6 +27,8 @@ public class Bobo{
 		run(new String(bytes, Charset.defaultCharset()));
 		if(hadError) 
 			System.exit(65); //data input error
+		if(hadRuntimeError)
+			System.exit(70); //runtime error
 	}
 	private static void runPrompt() throws IOException{
 		InputStreamReader input=new InputStreamReader(System.in);
@@ -44,8 +48,7 @@ public class Bobo{
 		Expr expression=parser.parse();
 		if(hadError)
 			return;
-		System.out.println(new AstPrinter().print(expression));
-		//TODO: create resolver, interpreter
+		interpreter.interpret(expression);
 	}
 	static void error(int line, String message){
 		report(line, "", message);
@@ -61,5 +64,9 @@ public class Bobo{
 		else{
 			report(token.line, " at '"+token.lexeme+"'",message);
 		}
+	}
+	static void runtimeError(RuntimeError error){
+		System.err.println(error.getMessage()+"\n[line "+error.token.line+"]");
+		hadRuntimeError=true;
 	}
 }
