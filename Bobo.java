@@ -45,10 +45,10 @@ public class Bobo{
 		Scanner sc=new Scanner(source);
 		List<Token> tokens=sc.scanTokens();
 		Parser parser=new Parser(tokens);
-		Expr expression=parser.parse();
+		List<Stmt> statements=parser.parse();
 		if(hadError)
 			return;
-		interpreter.interpret(expression);
+		interpreter.interpret(statements);
 	}
 	static void error(int line, String message){
 		report(line, "", message);
