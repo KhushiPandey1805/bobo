@@ -1,5 +1,6 @@
 package com.github.khushipandey1805.bobo;
 
+import java.util.ArrayList;
 import java.util.List;
 import static com.github.khushipandey1805.bobo.TokenType.*; //just for convenience of not having to write TokenType.stuff everytime, can just write stuff
 
@@ -10,15 +11,30 @@ class Parser{
     Parser(List<Token> tokens){
         this.tokens=tokens;
     }
-    Expr parse(){
-        try{
-            return expression();
-        } catch (ParseError error){
-            return null;
+    List<Stmt> parse(){
+        List<Stmt> statements=new ArrayList<>();
+        while(!isAtEnd()){
+            statements.add(statement());
         }
+        return statements;
     }
     private Expr expression(){
         return equality();
+    }
+    private Stmt statement(){
+        if(match(PRINT))
+            return printStatement();
+        return expressionStatement();
+    }
+    private Stmt printStatement(){
+        Expr value=expression();
+        consume(SEMICOLON, "Where's the ';' bro?");
+        return new Stmt.Print(value);
+    }
+    private Stmt expressionStatement(){
+        Expr expr=expression();
+        consume(SEMICOLON, "Where's the ';' bro?");
+        return new Stmt.Expression(expr);
     }
     private Expr equality(){ //equality→ comparison ( ( "!=" | "==" ) comparison )* ;
         Expr expr=comparison();
@@ -76,10 +92,10 @@ class Parser{
         }
         if(match(LEFT_PAREN)){
             Expr expr=expression();
-            consume(RIGHT_PAREN, "Expect ')' after expression.");
+            consume(RIGHT_PAREN, "I think you're missing a ')' bestie!");
             return new Expr.Grouping(expr);
         }
-        throw error(peek(), "Expect expression.");
+        throw error(peek(), "Expect expression :(");
     }
     private boolean match(TokenType... types){
         for(TokenType type:types){
