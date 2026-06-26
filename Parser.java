@@ -1,6 +1,7 @@
 package com.github.khushipandey1805.bobo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import static com.github.khushipandey1805.bobo.TokenType.*; //just for convenience of not having to write TokenType.stuff everytime, can just write stuff
 
@@ -32,11 +33,55 @@ class Parser{
         }
     }
     private Stmt statement(){
+        if(match(FOR))
+            return forStatement();
+        if(match(IF))
+            return ifStatement();
         if(match(PRINT))
             return printStatement();
+        if(match(WHILE))
+            return whileStatement();
         if(match(LEFT_BRACE))
             return new Stmt.Block(block());
         return expressionStatement();
+    }
+    private Stmt forStatement(){ //desugaring!!
+        consume(LEFT_PAREN, "Bestie where's the '('?");
+        Stmt initializer;
+        if(match(SEMICOLON))
+            initializer=null;
+        else if(match(VAR))
+            initializer=varDeclaration();
+        else
+            initializer=expressionStatement();
+        Expr condition=null;
+        if(!check(SEMICOLON))
+            condition=expression();
+        consume(SEMICOLON,"Where's the ';' after the loop condition bro?");
+        Expr increment=null;
+        if(!check(RIGHT_PAREN))
+            increment=expression();
+        consume(RIGHT_PAREN, "Bestie where's the ')' after the for clause?");
+        Stmt body=statement();
+        if(increment!=null)
+            body=new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
+        if(condition==null)
+            condition=new Expr.Literal(true);
+        body=new Stmt.While(condition, body);
+        if(initializer!=null)
+            body=new Stmt.Block(Arrays.asList(initializer,body));
+        return body;
+    }
+    private Stmt ifStatement(){
+        consume(LEFT_PAREN, "Bestie where's the '('?");
+        Expr condition=expression();
+        consume(RIGHT_PAREN, "Bestie where's the ')'?");
+        Stmt thenBranch=statement();
+        Stmt elseBranch=null;
+        if(match(ELSE)){
+            elseBranch=statement();
+        }
+        return new Stmt.If(condition,thenBranch,elseBranch);
     }
     private Stmt printStatement(){
         Expr value=expression();
@@ -52,6 +97,13 @@ class Parser{
         consume(SEMICOLON, "Where's the ';' bro?");
         return new Stmt.Var(name, initializer);
     }
+    private Stmt whileStatement(){
+        consume(LEFT_PAREN, "Bestie where's the '('?");
+        Expr condition=expression();
+        consume(RIGHT_PAREN, "Bestie where's the ')'?");
+        Stmt body=statement();
+        return new Stmt.While(condition,body);
+    }
     private Stmt expressionStatement(){
         Expr expr=expression();
         consume(SEMICOLON, "Where's the ';' bro?");
@@ -66,7 +118,7 @@ class Parser{
         return statements;
     }
     private Expr assignment(){
-        Expr expr=equality();
+        Expr expr=or();
         if(match(EQUAL)){
             Token equals=previous();
             Expr value=assignment();
@@ -75,6 +127,24 @@ class Parser{
                 return new Expr.Assign(name, value);
             }
             error(equals, "Invalid assignment target bestie!!");
+        }
+        return expr;
+    }
+    private Expr or(){
+        Expr expr=and();
+        while(match(OR)){
+            Token operator=previous();
+            Expr right=and();
+            expr=new Expr.Logical(expr, operator, right);
+        }
+        return expr;
+    }
+    private Expr and(){
+        Expr expr=equality();
+        while(match(AND)){
+            Token operator=previous();
+            Expr right=equality();
+            expr=new Expr.Logical(expr, operator,right);
         }
         return expr;
     }
