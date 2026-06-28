@@ -190,7 +190,30 @@ class Parser{
             Expr right=unary();
             return new Expr.Unary(operator, right);
         }
-        return primary();
+        return call();
+    }
+    private Expr finishcall(Expr callee){
+        List<Expr> arguments=new ArrayList<>();
+        if(!check(RIGHT_PAREN)){
+            do{
+                if(arguments.size()>=255){
+                    error(peek(), "You can't have more than 255 arguments girlypop!");
+                }
+                arguments.add(expression());
+            }while(match(COMMA));
+        }
+        Token paren=consume(RIGHT_PAREN,"Bestie where's the ')' after the arguments?");
+        return new Expr.Call(callee, paren, arguments);
+    }
+    private Expr call(){
+        Expr expr=primary();
+        while(true){
+            if(match(LEFT_PAREN))
+                expr=finishcall(expr);
+            else
+                break;
+        }
+        return expr;
     }
     private Expr primary(){ //primary→ NUMBER | STRING | "true" | "false" | "nil"| "(" expression ")" ;
         if(match(FALSE))
