@@ -24,6 +24,8 @@ class Parser{
     }
     private Stmt declaration(){
         try{
+            if(match(FUNC))
+                return function("function");
             if(match(VAR))
                 return varDeclaration();
             return statement();
@@ -39,6 +41,8 @@ class Parser{
             return ifStatement();
         if(match(PRINT))
             return printStatement();
+        if(match(RETURN))
+            return returnStatement();
         if(match(WHILE))
             return whileStatement();
         if(match(LEFT_BRACE))
@@ -88,6 +92,14 @@ class Parser{
         consume(SEMICOLON, "Where's the ';' bro?");
         return new Stmt.Print(value);
     }
+    private Stmt returnStatement(){
+        Token keyword=previous();
+        Expr value=null;
+        if(!check(SEMICOLON)){
+            value=expression();
+        }
+        return new Stmt.Return(keyword,value);
+    }
     private Stmt varDeclaration(){
         Token name=consume(IDENTIFIER, "No variable name </3");
         Expr initializer=null;
@@ -108,6 +120,22 @@ class Parser{
         Expr expr=expression();
         consume(SEMICOLON, "Where's the ';' bro?");
         return new Stmt.Expression(expr);
+    }
+    private Stmt.Function function(String kind){
+        Token name=consume(IDENTIFIER, "Was expecting "+kind+" name bestie :(");
+        consume(LEFT_PAREN,  "Bestie where's the '(' after "+kind+" name?");
+        List<Token> parameters=new ArrayList<>();
+        if(!check(RIGHT_PAREN)){
+            do{
+                if(parameters.size()>=255)
+                    error(peek(), "You can't have more than 255 arguments girlypop!");
+                parameters.add(consume(IDENTIFIER, "Parameter name where bbg?"));
+            } while(match(COMMA));
+        }
+        consume(RIGHT_PAREN,"Bestie where's the '(' after parameters?");
+        consume(LEFT_BRACE, "Bestie where's the '{' before "+kind+" body?");
+        List<Stmt> body=block();
+        return new Stmt.Function(name, parameters, body);
     }
     private List<Stmt> block(){
         List<Stmt> statements=new ArrayList<>();
