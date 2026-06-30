@@ -4,7 +4,9 @@ import java.util.List;
 
 class BoboFunction implements BoboCallable{
     private final Stmt.Function declaration;
-    BoboFunction(Stmt.Function declaration){
+    private final Environment closure;
+    BoboFunction(Stmt.Function declaration, Environment closure){
+        this.closure=closure;
         this.declaration=declaration;
     }
     @Override
@@ -17,11 +19,15 @@ class BoboFunction implements BoboCallable{
     }
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments){
-        Environment environment=new Environment(interpreter.globals);
+        Environment environment=new Environment(closure);
         for(int i=0;i<declaration.params.size();i++){
             environment.define(declaration.params.get(i).lexeme,arguments.get(i));
         }
-        interpreter.executeBlock(declaration.body, environment);
+        try{
+            interpreter.executeBlock(declaration.body, environment);
+        } catch(Return returnValue){
+            return returnValue.value;
+        }
         return null;
     }
 }

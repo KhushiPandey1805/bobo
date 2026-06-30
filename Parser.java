@@ -98,6 +98,7 @@ class Parser{
         if(!check(SEMICOLON)){
             value=expression();
         }
+        consume(SEMICOLON, "Where's the ';' bro?");
         return new Stmt.Return(keyword,value);
     }
     private Stmt varDeclaration(){

@@ -133,7 +133,7 @@ class Interpreter implements Expr.Visitor<Object>,Stmt.Visitor<Void>{
     }
     @Override
     public Void visitFunctionStmt(Stmt.Function stmt){
-        BoboFunction function=new BoboFunction(stmt);
+        BoboFunction function=new BoboFunction(stmt,environment);
         environment.define(stmt.name.lexeme, function);
         return null;
     }
@@ -151,6 +151,13 @@ class Interpreter implements Expr.Visitor<Object>,Stmt.Visitor<Void>{
         Object value=evaluate(stmt.expression);
         System.out.println(stringify(value));
         return null;
+    }
+    @Override
+    public Void visitReturnStmt(Stmt.Return stmt){
+        Object value=null;
+        if(stmt.value!=null)
+            value=evaluate(stmt.value);
+        throw new Return(value);
     }
     @Override
     public Void visitVarStmt(Stmt.Var stmt){
