@@ -54,7 +54,7 @@ public class Bobo{
 		report(line, "", message);
 	}
 	private static void report(int line, String where, String message){
-		System.err.println("[line "+line+"] Oopsies"+where+": "+message); //[line 3] Oopsies: unexpected character
+		System.err.println("[line "+line+"] Uh oh"+where+"!: "+message); //[line 3] Oopsies: unexpected character
 		hadError=true;
 	}
 	static void error(Token token, String message){
