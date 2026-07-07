@@ -24,6 +24,8 @@ class Parser{
     }
     private Stmt declaration(){
         try{
+            if(match(CLASS)) 
+                return classDeclaration();
             if(match(FUNC))
                 return function("function");
             if(match(VAR))
@@ -33,6 +35,16 @@ class Parser{
             synchronize();
             return null;
         }
+    }
+    private Stmt classDeclaration(){
+        Token name=consume(IDENTIFIER, "Where class name :(");
+        consume(LEFT_BRACE, "Bestie where's the '{' before the class body?");
+        List<Stmt.Function> methods=new ArrayList<>();
+        while(!check(RIGHT_BRACE) &&!isAtEnd()){
+            methods.add(function("method"));
+        }
+        consume(RIGHT_BRACE, "Bestie where's the '}' after the class body?");
+        return new Stmt.Class(name, methods);
     }
     private Stmt statement(){
         if(match(FOR))
