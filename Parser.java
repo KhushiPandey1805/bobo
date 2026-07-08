@@ -251,6 +251,10 @@ class Parser{
         while(true){
             if(match(LEFT_PAREN))
                 expr=finishcall(expr);
+            else if(match(DOT)){
+                Token name=consume(IDENTIFIER, "Diva mention propety name after '.'!");
+                expr=new Expr.Get(expr, name);
+            }
             else
                 break;
         }

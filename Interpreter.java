@@ -263,4 +263,12 @@ class Interpreter implements Expr.Visitor<Object>,Stmt.Visitor<Void>{
         }
         return function.call(this, arguments);
     }
+    @Override
+    public Object visitGetExpr(Expr.Get expr){
+        Object object=evaluate(expr.object);
+        if(object instanceof BoboInstance){
+            return ((BoboInstance)object).get(expr.name);
+        }
+        throw new RuntimeError(expr.name, "Not to be mean but only instances have preoprties :(");
+    }
 }
