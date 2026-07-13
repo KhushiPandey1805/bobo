@@ -52,6 +52,16 @@ class Interpreter implements Expr.Visitor<Object>,Stmt.Visitor<Void>{
         return evaluate(expr.right);
     }
     @Override
+    public Object visitSetExpr(Expr.Set expr){
+        Object object=evaluate(expr.object);
+        if(!(object instanceof BoboInstance)){
+            throw new RuntimeError(expr.name, "Not to be mean but only instances have fields :(");
+        }
+        Object value=evaluate(expr.value);
+        ((BoboInstance)object).set(expr.name,value);
+        return value;
+    }
+    @Override
     public Object visitUnaryExpr(Expr.Unary expr){
         Object right=evaluate(expr.right);
         switch(expr.operator.type){
@@ -143,7 +153,12 @@ class Interpreter implements Expr.Visitor<Object>,Stmt.Visitor<Void>{
     @Override
     public Void visitClassStmt(Stmt.Class stmt){
         environment.define(stmt.name.lexeme, null);
-        BoboClass klass=new BoboClass(stmt.name.lexeme);
+        Map<String, BoboFunction> methods=new HashMap<>();
+        for(Stmt.Function method: stmt.methods){
+            BoboFunction function=new BoboFunction(method, environment);
+            methods.put(method.name.lexeme, function);
+        }
+        BoboClass klass=new BoboClass(stmt.name.lexeme, methods);
         environment.assign(stmt.name, klass);
         return null;
     }

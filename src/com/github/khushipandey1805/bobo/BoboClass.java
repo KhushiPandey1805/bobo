@@ -5,8 +5,15 @@ import java.util.Map;
 
 class BoboClass implements BoboCallable{
     final String name;
-    BoboClass(String name){
+    private final Map<String, BoboFunction> methods;
+    BoboClass(String name, Map<String, BoboFunction> methods){
         this.name=name;
+        this.methods=methods;
+    }
+    BoboFunction findMethod(String name){
+        if(methods.containsKey(name))
+            return methods.get(name);
+        return null;
     }
     @Override
     public String toString(){
