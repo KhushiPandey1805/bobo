@@ -22,10 +22,16 @@ class BoboClass implements BoboCallable{
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments){
         BoboInstance instance=new BoboInstance(this);
+        BoboFunction initializer=findMethod("init"); //seed is the init method! (maybe later)
+        if(initializer!=null)
+            initializer.bind(instance).call(interpreter,arguments);
         return instance;
     }
     @Override
     public int arity(){
-        return 0;
+        BoboFunction initializer=findMethod("init");
+        if(initializer==null)
+            return 0;
+        return initializer.arity();
     }
 }

@@ -13,8 +13,12 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         this.interpreter=interpreter;
     }
     private enum FunctionType{
-        NONE, FUNCTION, METHOD
+        NONE, FUNCTION, INITIALIZER, METHOD
     }
+    private enum ClassType{
+        NONE, CLASS
+    }
+    private ClassType currentClass=ClassType.NONE;
     void resolve(List<Stmt> statements){
         for(Stmt statement: statements){
             resolve(statement);
@@ -41,12 +45,20 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     }
     @Override
     public Void visitClassStmt(Stmt.Class stmt){
+        ClassType enclosingClass=currentClass;
+        currentClass=ClassType.CLASS;
         declare(stmt.name);
         define(stmt.name);
+        beginScope();
+        scopes.peek().put("this", true);
         for(Stmt.Function method:stmt.methods){
             FunctionType declaration=FunctionType.METHOD;
+            if(method.name.lexeme.equals("init"))
+                declaration=FunctionType.INITIALIZER;
             resolveFunction(method, declaration);
         }
+        endScope();
+        currentClass=enclosingClass;
         return null;
     }
     @Override
@@ -78,8 +90,11 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     public Void visitReturnStmt(Stmt.Return stmt){
         if(currentFunction==FunctionType.NONE)
             Bobo.error(stmt.keyword, "Girlypop what are you trying to return from top-level code :(");
-        if(stmt.value!=null)
+        if(stmt.value!=null){
+            if(currentFunction==FunctionType.INITIALIZER)
+                Bobo.error(stmt.keyword, "Girlypop you cant't return from an initializer :(");
             resolve(stmt.value);
+        }
         return null;
     }
     @Override
@@ -144,6 +159,15 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
         return null;
     }
     @Override
+    public Void visitThisExpr(Expr.This expr){
+        if(currentClass==ClassType.NONE){
+            Bobo.error(expr.keyword, "Bro no 'this' outside of a class pls.");
+            return null;
+        }
+        resolveLocal(expr, expr.keyword);
+        return null;
+    }
+    @Override
     public Void visitUnaryExpr(Expr.Unary expr){
         resolve(expr.right);
         return null;
@@ -151,7 +175,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void>{
     @Override
     public Void visitVariableExpr(Expr.Variable expr){
         if(!scopes.isEmpty()&& scopes.peek().get(expr.name.lexeme)==Boolean.FALSE){
-            Bobo.error(expr.name, "Hey so you kinda can't read local variable in its own initialiser but kudos to you for trying!");
+            Bobo.error(expr.name, "Hey so you kinda can't read local variable in its own initializer but kudos to you for trying!");
         }
         resolveLocal(expr, expr.name);
         return null;

@@ -473,7 +473,7 @@ The long-term goal is to evolve Bobo from a tree-walk interpreter into a complet
 
 # Acknowledgements
 
-Bobo was originally inspired by Robert Nystrom's excellent book, *Crafting Interpreters*, which provides an accessible introduction to programming language implementation.
+Bobo was originally inspired by Robert Nystrom's excellent (and super funny) book, *Crafting Interpreters*, which provides an accessible introduction to programming language implementation.
 
 While many of the core concepts and overall architecture draw inspiration from the book, the project has evolved beyond a direct implementation through custom language features, project organization, runtime behavior, and planned extensions.
 

@@ -62,6 +62,10 @@ class Interpreter implements Expr.Visitor<Object>,Stmt.Visitor<Void>{
         return value;
     }
     @Override
+    public Object visitThisExpr(Expr.This expr){
+        return lookUpVariable(expr.keyword, expr);
+    }
+    @Override
     public Object visitUnaryExpr(Expr.Unary expr){
         Object right=evaluate(expr.right);
         switch(expr.operator.type){
@@ -155,7 +159,7 @@ class Interpreter implements Expr.Visitor<Object>,Stmt.Visitor<Void>{
         environment.define(stmt.name.lexeme, null);
         Map<String, BoboFunction> methods=new HashMap<>();
         for(Stmt.Function method: stmt.methods){
-            BoboFunction function=new BoboFunction(method, environment);
+            BoboFunction function=new BoboFunction(method, environment, method.name.lexeme.equals("init"));
             methods.put(method.name.lexeme, function);
         }
         BoboClass klass=new BoboClass(stmt.name.lexeme, methods);
@@ -169,7 +173,7 @@ class Interpreter implements Expr.Visitor<Object>,Stmt.Visitor<Void>{
     }
     @Override
     public Void visitFunctionStmt(Stmt.Function stmt){
-        BoboFunction function=new BoboFunction(stmt,environment);
+        BoboFunction function=new BoboFunction(stmt,environment, false);
         environment.define(stmt.name.lexeme, function);
         return null;
     }
