@@ -1,0 +1,15 @@
+class Animal {
+
+    speak() {
+        print "Some sound";
+    }
+}
+
+class Dog < Animal {
+
+    speak() {
+        print "Woof!";
+    }
+}
+
+Dog().speak();

@@ -1,0 +1,12 @@
+var x = "global";
+
+{
+    var x = "local";
+    print x;
+}
+
+print x;
+
+# expected output:
+# local
+# global

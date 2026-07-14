@@ -1,0 +1,7 @@
+var name = "Khushi";
+var age = 20;
+var pi = 3.14159;
+
+print name;
+print age;
+print pi;

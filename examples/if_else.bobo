@@ -1,0 +1,8 @@
+var score = 82;
+
+if (score >= 90) {
+    print "A";
+} 
+else {
+    print "Do better :(";
+}
