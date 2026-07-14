@@ -39,7 +39,6 @@ Although Bobo began as an educational project inspired by *Crafting Interpreters
 - Classes, inheritance, constructors, and method overriding
 - Native functions and built-in runtime utilities
 - Interactive REPL and script execution
-- Multi-line string literals
 - `#` single-line comments
 - Clear runtime and syntax error reporting
 
@@ -336,23 +335,6 @@ Woof!
 
 ---
 
-## Multi-line Strings
-
-```bobo
-print """
-Bobo
-supports
-multi-line strings.
-""";
-```
-
-```
-Bobo
-supports
-multi-line strings.
-```
-
----
 
 ## Comments
 
