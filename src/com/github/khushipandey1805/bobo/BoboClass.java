@@ -5,14 +5,18 @@ import java.util.Map;
 
 class BoboClass implements BoboCallable{
     final String name;
+    final BoboClass superclass;
     private final Map<String, BoboFunction> methods;
-    BoboClass(String name, Map<String, BoboFunction> methods){
+    BoboClass(String name, BoboClass superclass, Map<String, BoboFunction> methods){
+        this.superclass=superclass;
         this.name=name;
         this.methods=methods;
     }
     BoboFunction findMethod(String name){
         if(methods.containsKey(name))
             return methods.get(name);
+        if(superclass!=null)
+            return superclass.findMethod(name);
         return null;
     }
     @Override
